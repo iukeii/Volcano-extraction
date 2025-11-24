@@ -80,17 +80,4 @@ Sunkus – lava plinta greitai
 
 Sunkumo lygis lemia, kiek kartų lava išplinta per vieną pasaulio ėjimą.
 
-🛠️ Paleidimas
-Kompiliavimas (Linux / macOS):
-g++ -std=c++17 main.cpp -o evakuacija
-./evakuacija
 
-Kompiliavimas (Windows su MinGW):
-g++ -std=c++17 main.cpp -o evakuacija.exe
-evakuacija.exe
-
-📂 Projekto struktūra (jei pateikiama darbui)
-/
-├── README.md
-├── main.cpp
-└── (papildomi failai, jei suskaidyta į klases)
