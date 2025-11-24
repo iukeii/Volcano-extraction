@@ -458,7 +458,15 @@ private:
 };
 
 int main() {
-    Game game;
-    game.run();
-    return 0;
+    while (true) {
+        Game game;
+        game.run();
+
+        cout << "\nRestart game? (y/n): ";
+        string ans;
+        getline(cin, ans);
+
+        if (ans != "y" && ans != "Y")
+            break;
+    }
 }
