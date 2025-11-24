@@ -33,7 +33,7 @@ struct Citizen {
 
 struct Cell {
     CellType type = CellType::Road;
-    int citizenIndex = -1; // -1 = nėra NPC
+    int citizenIndex = -1;
 };
 
 class Game {
@@ -42,7 +42,7 @@ private:
     vector<Citizen> citizens;
 
     Position volcanoPos;
-    int difficulty; // 1 – easy, 2 – normal, 3 – hard
+    int difficulty;
     vector<Position> lavaFront;
 
 public:
@@ -71,16 +71,14 @@ public:
                 break;
             }
 
-            
-            running = handleTurn();   // čia nevyksta lava/NPC judesys
+            running = handleTurn();
             if (!running) break;
 
-            updateWorld();            // Upadating world
+            updateWorld();
         }
     }
 
 private:
-    // ---------------------- Inicijavimas ----------------------
     void resetMap() {
         for (int y = 0; y < MAP_SIZE; ++y) {
             for (int x = 0; x < MAP_SIZE; ++x) {
@@ -89,10 +87,8 @@ private:
             }
         }
 
-        // Ugnikalnis per vidurį
         map[volcanoPos.y][volcanoPos.x].type = CellType::Volcano;
 
-        // Saugios zonos – kampuose
         map[0][0].type = CellType::SafeZone;
         map[0][MAP_SIZE - 1].type = CellType::SafeZone;
         map[MAP_SIZE - 1][0].type = CellType::SafeZone;
@@ -100,7 +96,6 @@ private:
 
         citizens.clear();
 
-        // Pirma lavos banga prasideda ugnikalnyje
         lavaFront.clear();
         lavaFront.push_back(volcanoPos);
 
@@ -108,14 +103,13 @@ private:
     }
 
     void spawnHousesAndCitizens() {
-        int numHouses = 4 + (rand() % 3); // 5 arba 6
+        int numHouses = 4 + (rand() % 3);
         int created = 0;
 
         while (created < numHouses) {
             int x = rand() % MAP_SIZE;
             int y = rand() % MAP_SIZE;
 
-            // Namu nekeliam ant ugnikalnio, lavos ar saugios zonos
             if (map[y][x].type == CellType::Road) {
                 map[y][x].type = CellType::House;
 
@@ -140,22 +134,21 @@ private:
 
             string line;
             getline(cin, line);
+
             if (line == "1") { difficulty = 1; break; }
             if (line == "2") { difficulty = 2; break; }
             if (line == "3") { difficulty = 3; break; }
         }
     }
 
-    // ---------------------- Piesimas ----------------------
     void draw() {
-
         system("cls");
 
         for (int y = 0; y < MAP_SIZE; ++y) {
             for (int x = 0; x < MAP_SIZE; ++x) {
                 cout << cellChar(x, y) << ' ';
             }
-            cout << " | y=" << y+1 << "\n";
+            cout << " | y=" << y + 1 << "\n";
         }
         cout << "\nValdymas:\n";
         cout << "  B x y  - pastatyti / nuimti barikada (#) \n";
@@ -169,7 +162,6 @@ private:
     }
 
     char cellChar(int x, int y) {
-        // Jeigu čia yra gyvas NPC – rodom C
         int idx = map[y][x].citizenIndex;
         if (idx >= 0 && idx < (int)citizens.size()) {
             if (citizens[idx].alive && !citizens[idx].escaped) {
@@ -204,7 +196,6 @@ private:
         return c;
     }
 
-    // ---------------------- Vieno EJIMO logika ----------------------
     bool handleTurn() {
         int barricadesLeft = 5;
 
@@ -215,7 +206,6 @@ private:
             string line;
             getline(cin, line);
 
-            // tuščias eilutė – baigiam ėjimą, pasaulis pajuda
             if (line.empty()) {
                 return true;
             }
@@ -226,7 +216,7 @@ private:
             cmd = (char)tolower((unsigned char)cmd);
 
             if (cmd == 'q') {
-                return false; // baigiam žaidimą
+                return false;
             }
 
             if (cmd == 'b') {
@@ -237,7 +227,7 @@ private:
                 }
                 int x, y;
                 if (!(ss >> x >> y)) {
-                    cout << "Blogas formatas. Naudok: B x y (pvz. B 3 4)\n";
+                    cout << "Blogas formatas. Naudok: B 3 4\n";
                     continue;
                 }
                 toggleBarricadeAt(x, y);
@@ -257,7 +247,6 @@ private:
 
         Cell& c = map[y][x];
 
-        // ant lavos / saugios zonos / ugnikalnio barikados nededam
         if (c.type == CellType::Lava ||
             c.type == CellType::SafeZone ||
             c.type == CellType::Volcano) {
@@ -275,23 +264,20 @@ private:
         }
     }
 
-    // ---------------------- Pasaulio logika ----------------------
     void updateWorld() {
-        spreadLava();    // lava plinta
-        moveCitizens();  // NPC juda i saugia zona
-        checkDeaths();   // NPC, kuriuos pasieke lava, zusta
-        checkEscapes();  // NPC, kurie pasieke S, isgelbejami
+        spreadLava();
+        moveCitizens();
+        checkDeaths();
+        checkEscapes();
     }
 
     bool isGameOver() const {
-        // baigiasi, kai visi pilieciai arba zuve, arba isgelbeti
         for (const auto& z : citizens) {
             if (z.alive && !z.escaped) return false;
         }
         return true;
     }
 
-    // ----------- Lava ------------
     void spreadLavaOnce() {
         vector<Position> newFront;
 
@@ -308,14 +294,12 @@ private:
 
                 Cell& c = map[ny][nx];
 
-                //  Lava neina lava ugnikaln barikadą
                 if (c.type == CellType::Lava ||
                     c.type == CellType::Volcano ||
                     c.type == CellType::Barricade) {
                     continue;
                 }
 
-                // lava gali suvalgyti kelia namus saugias zonas
                 c.type = CellType::Lava;
                 newFront.push_back({ nx, ny });
             }
@@ -327,18 +311,14 @@ private:
         lavaFront.insert(lavaFront.end(), newFront.begin(), newFront.end());
     }
 
-
     void spreadLava() {
-        // sunkumas = kiek kartų per eiga plinta lava
-        int steps = difficulty; // 1, 2 arba 3
+        int steps = difficulty;
         for (int i = 0; i < steps; ++i) {
             spreadLavaOnce();
         }
     }
 
-    // ----------- judėjimas ------------
     bool isWalkableForCitizen(CellType t) const {
-        // NPC neina per lava ugnikalni barikadas
         if (t == CellType::Lava || t == CellType::Volcano || t == CellType::Barricade)
             return false;
         return true;
@@ -354,7 +334,6 @@ private:
 
         queue<Position> q;
 
-        
         for (int y = 0; y < MAP_SIZE; ++y) {
             for (int x = 0; x < MAP_SIZE; ++x) {
                 if (map[y][x].type == CellType::SafeZone) {
@@ -388,7 +367,6 @@ private:
             }
         }
 
-        // dabar judinam kiekvieną pilietį link mažiausio dist kaimyno
         for (int i = 0; i < (int)citizens.size(); ++i) {
             Citizen& c = citizens[i];
             if (!c.alive || c.escaped) continue;
@@ -417,7 +395,6 @@ private:
                 }
             }
 
-            // jei suradome geresnį kaimyną – judame
             if (bestX != x || bestY != y) {
                 if (map[y][x].citizenIndex == i) {
                     map[y][x].citizenIndex = -1;
@@ -429,7 +406,6 @@ private:
         }
     }
 
-    // ----------- Mirtis ir išsigelbėjimas ------------
     void checkDeaths() {
         for (int i = 0; i < (int)citizens.size(); ++i) {
             Citizen& c = citizens[i];
