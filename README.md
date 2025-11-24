@@ -1,5 +1,4 @@
-📘 Ugnikalnio Evakuacija – README (lietuviškai)
-📝 Aprašymas
+📘 Ugnikalnio Evakuacija – README 
 
 Ugnikalnio evakuacija – tai objektinio programavimo principus demonstruojantis C++ konsolinis žaidimas.
 Miestelyje įvyksta ugnikalnio išsiveržimas, o žaidėjas turi padėti gyventojams pasiekti saugias zonas, kol juos pasiekia plintanti lava.
